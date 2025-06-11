@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <title>行人軌跡</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <div id="header">
+      <div id="text"></div>
+
+      <div id="controls">
+        <div>秒數:</div>
+        <div id="step">0</div>
+        <input
+          type="button"
+          name=""
+          id="restart"
+          class="btn"
+          value="重新整理"
+        />
+        <input type="button" name="" id="start" class="btn" value="開始模擬" />
+        <input type="checkbox" name="" id="perspective" />
+      </div>
+    </div>
+
+    <script type="module" src="./src/index.js"></script>
+  </body>
+</html>
