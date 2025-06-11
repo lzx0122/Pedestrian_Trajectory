@@ -60,7 +60,7 @@ for (let x = -10; x <= 10; x++) {
 }
 
 // 模擬的座標資料
-const ped = {
+const ped1 = {
   name: "行人1",
   color: 0x00ff00,
   steps: [
@@ -77,8 +77,9 @@ const ped = {
     { x: 2, z: -4 },
     { x: 2, z: -5 },
   ], collistionScope: { length: 1, width: 1 }
-
 };
+
+let peds = [ped1]
 
 const car = {
   name: "車",
@@ -219,37 +220,40 @@ async function preShowTrajectory() {
     setPoint(tempPoints, makerTemp, step);
   }
   let isCollision = false;
-  for (let step = 0; step < car.steps.length; step++) {
+  for (let ped of peds) {
+    for (let step = 0; step < car.steps.length; step++) {
 
-    let makerTemp = showTrajectory(ped, step, ped.color); // 開始顯示
-    ped.steps[step].maker = makerTemp; // 將行人的步數與顯示的物件關聯
-    setPoint(tempPoints, makerTemp, step);
-    if (isCollision) continue;
-    // 檢查是否有碰撞
-    for (let [key, value] of tempPoints) {
+      let makerTemp = showTrajectory(ped, step, ped.color); // 開始顯示
+      ped.steps[step].maker = makerTemp; // 將行人的步數與顯示的物件關聯
+      setPoint(tempPoints, makerTemp, step);
+      if (isCollision) continue;
+      // 檢查是否有碰撞
+      for (let [key, value] of tempPoints) {
 
-      if (value.pedObjs.length >= 1) {
-        let str = `(${step + 1}秒後)碰撞物體: `;
+        if (value.pedObjs.length >= 1) {
+          let str = `(${step + 1}秒後)碰撞物體: `;
 
-        text.innerHTML = str + value.pedObjs.map((v) => v.maker.obj.name).join(", ");
-        value.pedObjs.forEach((v) => v.maker.material.color.set(0xff0000)) // 將行人設定紅色(行人碰撞點)
-        //創建紅色碰撞區
-        let carMaker = value.carObj.maker;
-        carMaker.material.color.set(0x000000); // 將車輛顏色改為紅色
-        const boxGeo = new THREE.BoxGeometry(carMaker.obj.collistionScope.length, 0.02, carMaker.obj.collistionScope.width);
-        const boxMat = new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0.5, transparent: true });
-        const box = new THREE.Mesh(boxGeo, boxMat);
-        let carPosition = carMaker.obj.steps[step];
-        box.position.set(carPosition.x, 0, carPosition.z);
-        box.name = "collisionBox";
-        scene.add(box);
-        makerTemps.push(box)
-        isCollision = true;
-        break;
+          text.innerHTML = str + value.pedObjs.map((v) => v.maker.obj.name).join(", ");
+          value.pedObjs.forEach((v) => v.maker.material.color.set(0xff0000)) // 將行人設定紅色(行人碰撞點)
+          //創建紅色碰撞區
+          let carMaker = value.carObj.maker;
+          carMaker.material.color.set(0x000000); // 將車輛顏色改為紅色
+          const boxGeo = new THREE.BoxGeometry(carMaker.obj.collistionScope.length, 0.02, carMaker.obj.collistionScope.width);
+          const boxMat = new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0.5, transparent: true });
+          const box = new THREE.Mesh(boxGeo, boxMat);
+          let carPosition = carMaker.obj.steps[step];
+          box.position.set(carPosition.x, 0, carPosition.z);
+          box.name = "collisionBox";
+          scene.add(box);
+          makerTemps.push(box)
+          isCollision = true;
+          break;
+        }
       }
+
+      //await new Promise((resolve) => setTimeout(resolve, 1000)); // 每點延遲 1 秒
     }
 
-    //await new Promise((resolve) => setTimeout(resolve, 1000)); // 每點延遲 1 秒
   }
 
 }
@@ -343,5 +347,5 @@ document.querySelector("#restart").addEventListener("click", () => {
 
 //開始播放
 document.querySelector("#start").addEventListener("click", () => {
-  play(car, [ped], cameraMode.toLocaleUpperCase());
+  play(car, peds, cameraMode.toLocaleUpperCase());
 });
